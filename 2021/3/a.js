@@ -1,4 +1,4 @@
-const result = ["test.txt", "input.txt"].map(f => {
+console.log(["test.txt", "input.txt"].map(f => {
     const m = require("fs").readFileSync(f, 'utf8').split("\n").filter(x=>x).reduce((a, c) => {
         let i = c.length
         if (!a.length) a = Array(i).fill(0)
@@ -9,6 +9,4 @@ const result = ["test.txt", "input.txt"].map(f => {
         return [y, Number(!y)]
     })
     return m[0].map((_, c) => m.map(r => r[c])).map((x) => parseInt(x.join(""), 2))
-})
-    
-console.log(result)
+}))

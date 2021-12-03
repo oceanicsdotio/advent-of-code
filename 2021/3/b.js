@@ -5,29 +5,25 @@
 // generate - most common, allow ties, if tie keep 1s
 // scrubber - least common, allow ties, if tie keep 0s
 
-const fs = require("fs");
+const mostCommon = (arr) => Number(arr.reduce((acc, cur) => acc + 2*cur-1, 0) >= 0);
+const leastCommon = (arr) => Number(arr.reduce((acc, cur) => acc + 2*cur-1, 0) <= 0);
 
-const records = fs.readFileSync("test.txt", 'utf8').split("\n").filter(x=>x).map(row => row.split(""));
-const transpose = records[0].map((_, colIndex) => records.map(row => row[colIndex]));
-
-const genScore = (transpose) => {
-
-    transpose.forEach((column) => {
-        column.forEach((value) => {})
+function gen(transpose, mask, modeFcn) {
+    const column = transpose.shift()
+    let _mode = modeFcn(column)
+    const newMask = column.map((x, ii) => mask[ii]&&x===_mode)
+    let jj, count = 0;
+    mask.forEach((val, index) => {
+        if (val) {jj = index; count++}
     })
-
+    return (count === 1 || transpose.length === 0) ? jj : gen(transpose, newMask, modeFcn)
 }
 
+const calc = (modeFcn) => {
+    const data = require("fs").readFileSync("test.txt", 'utf8').split("\n").filter(x=>x).map(row => row.split(""));
+    const transpose = data[0].map((_, colIndex) => data.map(row => parseInt(row[colIndex])));
+    const index = gen(transpose, Array(data.length).fill(true), modeFcn)
+    return parseInt(data[index].join(""), 2)
+}
 
-// reduce((acc, cur) => {
-//     let ii = cur.length
-//     if (!acc.length) acc = Array(ii).fill(0)
-//     while (ii--) acc[ii] += (2*parseInt(cur.charAt(ii))-1)
-//     return acc
-// }, []).map(x=>((x/Math.abs(x))+1)/2);
-
-// const invert = records.map(bit => Number(!bit));
-
-// const gamma = parseInt(records.join(""),2)
-// const epsilon = parseInt(invert.join(""),2)
-console.log(records, transpose)
+console.log(calc(mostCommon) * calc(leastCommon))
