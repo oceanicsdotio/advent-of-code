@@ -1,14 +1,14 @@
-const fs = require("fs");
-
-const records = fs.readFileSync("input.txt", 'utf8').split("\n").filter(x=>x).reduce((acc, cur) => {
-    let ii = cur.length
-    if (!acc.length) acc = Array(ii).fill(0)
-    while (ii--) acc[ii] += (2*parseInt(cur.charAt(ii))-1)
-    return acc
-}, []).map(x=>((x/Math.abs(x))+1)/2);
-
-const invert = records.map(bit => Number(!bit));
-
-const gamma = parseInt(records.join(""),2)
-const epsilon = parseInt(invert.join(""),2)
-console.log(gamma, epsilon, epsilon*gamma)
+const result = ["test.txt", "input.txt"].map(f => {
+    const m = require("fs").readFileSync(f, 'utf8').split("\n").filter(x=>x).reduce((a, c) => {
+        let i = c.length
+        if (!a.length) a = Array(i).fill(0)
+        while (i--) a[i] += (2*parseInt(c.charAt(i))-1)
+        return a
+    }, []).map(x => {
+        const y = (x/Math.abs(x)+1)/2
+        return [y, Number(!y)]
+    })
+    return m[0].map((_, c) => m.map(r => r[c])).map((x) => parseInt(x.join(""), 2))
+})
+    
+console.log(result)
