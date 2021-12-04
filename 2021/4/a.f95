@@ -113,5 +113,6 @@ program main
     end do 
 
     write(*, *) boards(minloc(boards%turn, boards%turn .gt. 0))%score
+    write(*, *) boards(maxloc(boards%turn, boards%turn .gt. 0))%score
     
 end program main
