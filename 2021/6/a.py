@@ -1,6 +1,7 @@
 from functools import reduce
 from collections import deque
 from itertools import repeat
+import sys
 
 CYCLE = 7
 DELAY = 2
@@ -21,7 +22,7 @@ def evolve(school, epochs):
     return school
 
 if __name__ == "__main__":
-    with open("input.txt", "r") as fid:
+    with open(sys.argv[1], "r") as fid:
         fish = map(lambda x: int(x), fid.readline().split(","))
-    print(sum(evolve(reduce(reducer, fish, school), 256)))
+    print(sum(evolve(reduce(reducer, fish, school), int(sys.argv[2]))))
    
