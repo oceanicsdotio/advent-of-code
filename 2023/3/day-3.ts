@@ -6,8 +6,9 @@ interface Scan {
     symbols: number[]
 }
 
+// Retrieve interval of all numerics
 const numbers = (line: string): Interval[] => {
-    const numberRegex = new RegExp("([0-9]+)", "gi");
+    const numberRegex = new RegExp("([1-9])([0-9]*)", "gi");
     return [...line.matchAll(numberRegex)].map(
         (item) => {
             let index = item.index as number;
@@ -16,8 +17,9 @@ const numbers = (line: string): Interval[] => {
     );
 }
 
+// Retrieve indexes of all symbols
 const symbols = (line: string): number[] => {
-    const symbolRegex = new RegExp("[^A-Za-z0-9\.]", "gi")
+    const symbolRegex = new RegExp("[^0-9\.]", "gi")
     return [...line.matchAll(symbolRegex)].flatMap(
         (item) => item.index as number
     );
@@ -42,12 +44,19 @@ const convert = (line: string) =>
         if (isNaN(numeric)) {
             console.log("invalid conversion", substring, "of", line);
         }
-        return parseInt(line.slice(start, end + 1), 10);
+        return numeric;
     }
+
+// Reduce boiler plate
+const partitionWrapper = (source: Scan, symbols: number[]) => {
+    let pass: Interval[];
+    [pass, source.numbers] = partition(source.numbers, symbols);
+    return pass.map(convert(source.line));
+}
 
 function main() {
     const lines: string = require("fs").readFileSync(
-        "./day-3-sample.txt", 
+        "./day-3.txt", 
         {encoding: "utf8", flag: "r"}
     ).split("\n");
 
@@ -60,26 +69,12 @@ function main() {
             numbers: numbers(lines[ii]),
             symbols: symbols(lines[ii])
         };
-
-        // find current indices intersecting current symbols
-        const [accept, retry] = partition(current.numbers, current.symbols);
-        parts.push(...accept.map(convert(current.line)));
-
-        if (typeof previous === "undefined") {
-            current.numbers = retry;
-        } else {
-            // find current indices intersecting previous symbols
-            const [lookback, store] = partition(retry, previous.symbols);
-            parts.push(...lookback.map(convert(current.line)));
-            current.numbers = store;
-
-            // find previous indices intersecting current symbols, with discard
-            const [result, _] = partition(previous.numbers, current.symbols);
-            parts.push(...result.map(convert(previous.line)));
-
-            // Last item check
+        parts.push(...partitionWrapper(current, current.symbols));
+        if (typeof previous !== "undefined") {
+            parts.push(...partitionWrapper(current, previous.symbols));
+            parts.push(...partitionWrapper(previous, current.symbols));
             if (ii === lines.length - 1) {
-                parts.push(...store.map(convert(current.line)));
+                parts.push(...current.numbers.map(convert(current.line)));
             }
         }
         previous = current;
