@@ -1,0 +1,8 @@
+{
+  "devDependencies": {
+    "@types/node": "^20.10.2"
+  },
+  "dependencies": {
+    "jest": "^29.7.0"
+  }
+}
